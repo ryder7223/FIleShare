@@ -642,6 +642,7 @@ def download_from_user(username, filename):
         return redirect(url_for('login'))
     '''
     increment_download_count(filename)
+    user_for_logging = session.get('username', 'Anonymous')
     log_file_event('download', filename, session['username'], request.remote_addr)
     return send_from_directory(get_user_folder(username), filename, as_attachment=True)
 
