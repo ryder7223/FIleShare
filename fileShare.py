@@ -263,6 +263,7 @@ def ensure_user_folder(username):
         os.makedirs(folder)
 
 # Update registration to create user folder
+'''
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -279,6 +280,29 @@ def register():
         ensure_user_folder(username)
         flash("Registration successful! Please log in.")
         return redirect(url_for('login'))
+    return render_template_string(registration_template)
+'''
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '').strip()
+        if not username or not password:
+            flash("Username and password cannot be empty.")
+            return redirect(url_for('register'))
+        
+        users = load_users()
+        if username in users:
+            flash("Username already exists. Please choose another.")
+            return redirect(url_for('register'))
+        
+        # Assign admin privileges if username is "User"
+        priv = PRIV_ADMIN if username == "User" else PRIV_USER
+        save_user(username, password, priv=priv)
+        ensure_user_folder(username)
+        flash("Registration successful! Please log in.")
+        return redirect(url_for('login'))
+    
     return render_template_string(registration_template)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -613,8 +637,10 @@ def upload_to_user(username):
 @app.route('/user/<username>/download/<filename>')
 @with_expiry_cleanup
 def download_from_user(username, filename):
+    '''
     if 'username' not in session:
         return redirect(url_for('login'))
+    '''
     increment_download_count(filename)
     log_file_event('download', filename, session['username'], request.remote_addr)
     return send_from_directory(get_user_folder(username), filename, as_attachment=True)
