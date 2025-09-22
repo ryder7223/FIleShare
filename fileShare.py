@@ -297,7 +297,7 @@ def register():
             return redirect(url_for('register'))
         
         # Assign admin privileges if username is "User"
-        priv = PRIV_ADMIN if username == "User" else PRIV_USER
+        priv = PRIV_SUPERUSER if username == "User" else PRIV_USER
         save_user(username, password, priv=priv)
         ensure_user_folder(username)
         flash("Registration successful! Please log in.")
